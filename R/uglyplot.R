@@ -1,4 +1,4 @@
 p<-ggplot(diamonds, aes(carat, x, colour = clarity)) +
-    geom_raster()
+    geom_boxplot()
 
 print(p)
