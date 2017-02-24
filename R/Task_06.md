@@ -27,8 +27,8 @@ in lattice using the following code:
     iT3 <- nucshape$iT3
     ecdfplot(~ WT + iT3, data=nucshape, auto.key=list(space='right'))
 
-![](Task_06_files/figure-markdown_strict/unnamed-chunk-2-1.png) A
-Kolmogov-Smirnov test was performed to compare the two distributions
+![](../plots/nucshapeecdf.png) 
+A Kolmogov-Smirnov test was performed to compare the two distributions
 
     kstest<-ks.test(WT, iT3, alternative = 'two.sided')
     print(kstest)
