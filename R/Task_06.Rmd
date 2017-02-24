@@ -1,14 +1,15 @@
 ---
 title: "Root Hair Nuclear Shape"
-output: html_notebook
+output: html_output
+
 ---
 #Introduction
 Myosin XI-I is an unique member of the myosin XI family of unconventional molecular motor proteins in the flowering plant Arabidopis thaliana.  XI-I is a nucleocytoplasmic linker, connecting the outer nuclear envelope to the actin cytoskeleton.  The *xi-i* insertional knockout line *xi-iT3* exhibits a defective nuclear phenotype, with rounded, invaginated nuclei easily visible in root hair cells
 The circularity indices of nuclei in 4 DAG (days after germination) wild-type and *iT3* seedlings were measured using ImageJ.  (Note: This is not my real data set, I made this one up)
-```{r covars, results='asis'}
+```{r}
 library(knitr)
-nucshape<-read.table('data/nucdata.txt', header=TRUE)
-kable(nucshape, align='l')
+nucshape<-read.table('../data/nucdata.txt', header=TRUE)
+
 ```
 ##Results
 
@@ -21,6 +22,8 @@ WT <- nucshape$WT
 iT3 <- nucshape$iT3
 ecdfplot(~ WT + iT3, data=nucshape, auto.key=list(space='right'))
 ```
+
+
 A Kolmogov-Smirnov test was performed to compare the two distributions
 ```{r}
 kstest<-ks.test(WT, iT3, alternative = 'two.sided')
