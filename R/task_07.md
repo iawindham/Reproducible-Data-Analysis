@@ -23,6 +23,8 @@ library(outliers)
 library(nycflights13)
 library(babynames)
 library(nasaweather)
+knitr::opts_chunk$set(
+  fig.path = '../plots/')
 #Creates the dataframe 'median_windspeed'
 median_windspeed<- weather %>%
   #Only these three columns are needed for analysis
@@ -53,8 +55,6 @@ print(median_windspeed)
     ## # ... with 98 more rows
 
 ``` r
-knitr::opts_chunk$set(
-  fig.path = '../plots/')
 #Wind Direction vs Median Wind Speed is plotted for each airport
 median_windspeed_plot <- median_windspeed %>%
   ggplot(aes(wind_dir, median_wind_speed)) +
@@ -66,7 +66,7 @@ print(median_windspeed_plot)
 
     ## `geom_smooth()` using method = 'loess'
 
-![](task_07_files/figure-markdown_github/median_windspeed-1.png)
+![](../plots/median_windspeed-1.png)
 
 Using nycflights13::flights and nycflights13::airlines Make a table with two columns: airline name (not carrier code) and median distance flown from JFK airport. The table should be arranged in order of decreasing mean flight distance.
 
@@ -140,8 +140,6 @@ Babynames
 Identify the ten most common male and female names in 2014. Make a plot of their frequency (prop) since 1880.
 
 ``` r
-knitr::opts_chunk$set(
-  fig.path = "../plots/")
 #dataframe of the ten most common male babynames of 2014
 most_common_male <- babynames %>%
   filter(year == "2014", sex == "M") %>%
@@ -172,9 +170,6 @@ print(all_names_frequency_plot)
 ![](../plots/baby_name_frequency-1.png)
 
 ``` r
-knitr::opts_chunk$set(
-  fig.path = "../plots/")
-  
 #The total frequency of the 10 most popular male&female names of 2014 was summed for each year
 prop_combined <- common_frequency %>%
   group_by(year, sex) %>%
@@ -227,8 +222,6 @@ Write task that involves some of the functions on the Data Wrangling Cheat Sheet
 The imported data frame contains the distance of the nucleus relative to the tip of a growing root hair at one minute intervals over twenty minutes, before and after treatment with oryzalin.
 
 ``` r
-knitr::opts_chunk$set(
-  fig.path = "../plots/")
 #imports root hair data.
 roothairdata <- read_csv("../data/2017_4_6_complete_dataset.csv", col_names = TRUE) %>%
   #combines ID and root_hair number columns to create a combined, more descriptive root hair ID (rh_ID)
