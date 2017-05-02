@@ -48,4 +48,8 @@ A p-value of
     ## [1] 0.02624849
 
 suggests that there is a significant difference between these two distributions.
-\#\#Discussion iT3 nuclei appear to generally be rounder(i.e. have a higher circularity index) than wild-type nuclei. This suggests that myosin XI-I plays a role in maintaining proper nuclear shape in *Arabidopsis*
+
+Discussion
+----------
+
+iT3 nuclei appear to generally be rounder(i.e. have a higher circularity index) than wild-type nuclei. This suggests that myosin XI-I plays a role in maintaining proper nuclear shape in *Arabidopsis*
