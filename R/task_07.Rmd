@@ -1,0 +1,174 @@
+---
+title: "task_07"
+output:   
+  md_document:
+    variant: markdown_github
+---    
+###NYCFlights13###
+Using the nycflights13::weather
+    Determine whether there are any clear outliers in wind speed (wind_speed) that should be rejected. If so, filter those bad point(s) and proceed.
+    What direction has the highest median speed at each airport? Make a table and a plot of median wind speed by direction, for each airport.
+  
+  
+    
+```{r}
+library(tidyverse)
+library(outliers)
+library(nycflights13)
+library(babynames)
+library(nasaweather)
+#Creates the dataframe 'median_windspeed'
+median_windspeed<- weather %>%
+  #Only these three columns are needed for analysis
+  select(wind_speed, wind_dir, origin) %>%
+  group_by(origin, wind_dir) %>%
+  #outliers of wind_speed are removed using the outlier() function from the outliers package
+  filter(wind_speed != c(outlier(wind_speed)), is.na(wind_dir) == FALSE) %>%
+  #median wind speed is calculated for each airport and wind direction
+  summarise(median_wind_speed = median(wind_speed, na.rm = TRUE))
+print(median_windspeed)
+```
+
+```{r median_windspeed}
+knitr::opts_chunk$set(
+  fig.path = '../plots/')
+#Wind Direction vs Median Wind Speed is plotted for each airport
+median_windspeed_plot <- median_windspeed %>%
+  ggplot(aes(wind_dir, median_wind_speed)) +
+  geom_smooth() + geom_point() +
+  facet_wrap(~origin) +
+  labs(x= "Wind Direction", y = "Median Wind Speed")
+print(median_windspeed_plot)
+```
+
+Using nycflights13::flights and nycflights13::airlines
+    Make a table with two columns: airline name (not carrier code) and median distance flown from JFK airport. 
+    The table should be arranged in order of decreasing mean flight distance. 
+```{r}
+#combines nycflights13::flights and nycflights13::airlines by the 'carrier' column
+combined_flights_airlines <- left_join(flights, airlines, by = 'carrier')
+
+distance_from_JFK <- combined_flights_airlines %>%
+  #only planes leaving JFK
+  filter(origin == 'JFK') %>%
+  select(name, distance) %>%
+  #median distance calculated for each airline
+  group_by(name) %>%
+  summarise(median_distance = median(distance)) %>%
+  arrange(desc(median_distance))
+print(distance_from_JFK)
+```
+Make a wide-format data frame that displays the number of flights that leave Newark ("EWR") airport each month, from each airline
+
+```{r}
+leaving_newark <- combined_flights_airlines %>%
+  #Only planes leaving Newark, and only the origin, name, and month variables are required
+  select(origin, name, month) %>%
+  filter(origin == "EWR") %>%
+  group_by(name, month) %>%
+  #number_left is equal to the number of flights that have left EWR for each month and airline
+  summarise(number_left = length(name))%>%
+  #Creates a table with months for columns, airlines for rows.  Entries are the number of flights leaving EWR for each airline and month.
+  spread(key = month, value = number_left)
+print(leaving_newark)
+```
+##Babynames##
+
+Identify the ten most common male and female names in 2014. Make a plot of their frequency (prop) since 1880. 
+```{r baby_name_frequency}
+knitr::opts_chunk$set(
+  fig.path = "../plots/")
+#dataframe of the ten most common male babynames of 2014
+most_common_male <- babynames %>%
+  filter(year == "2014", sex == "M") %>%
+  arrange(desc(n)) %>%
+  head(n=10)
+#dataframe of the tne most common female babynames of 2014
+most_common_female <- babynames %>%
+  filter(year == "2014", sex == "F") %>%
+  arrange(desc(n)) %>%
+  head(n=10)
+#combines most common male and most common female babynames of 2014 into one single dataset
+common_names_2014 <- full_join(most_common_male, most_common_female)
+#joins the initial babynames dataset with the most common names of 2014 by the 'name' and 'sex' columns
+#This shows the frequency of 10 most popular male&female babynames of 2014 since 1880
+common_frequency <- semi_join(babynames, common_names_2014, by = c('name', 'sex'))
+
+#A plot of the individual frequency of the ten most common male&female baby names of 2014
+all_names_frequency_plot <- common_frequency %>%
+  ggplot(aes(year, prop, color = sex)) + geom_point() + facet_wrap(~name)
+print(all_names_frequency_plot)
+```
+```{r combined_babyname_frequency}
+knitr::opts_chunk$set(
+  fig.path = "../plots/")
+  
+#The total frequency of the 10 most popular male&female names of 2014 was summed for each year
+prop_combined <- common_frequency %>%
+  group_by(year, sex) %>%
+  summarise('prop' = sum(prop))
+#A plot of the combined frequency of the 10 most common male and female babynames of 2014 over time
+prop_plot_combined <- prop_combined %>%
+  ggplot(aes(year, prop, color = sex)) + geom_point() + facet_wrap(~sex)
+print(prop_plot_combined)
+```
+
+
+It appears that common female babynames in recent years were significantly less common 50+ years ago.
+On the other hand, the most common male babynames were actually more common in the past than they are now,
+
+
+
+Make a single table of the 26th through 29th most common girls names in the year 1896, 1942, and 2016
+
+```{r}
+common_girl_26to29 <- babynames %>%
+  #only girls names from 1896, 1946, and 2014
+  filter(year ==  1896 | year == 1946 | year == 2014, sex == 'F') %>%
+  group_by(year) %>%
+  #most common first
+  arrange(desc(n)) %>%
+  #26th to 29th names
+  slice(26:29) %>%
+  select(year, name)
+print(common_girl_26to29)
+```
+Write task that involves some of the functions on the Data Wrangling Cheat Sheet and execute it. You may either use your own data or data packages
+
+The imported data frame contains the distance of the nucleus relative to the tip of a growing root hair at one minute intervals over twenty minutes, before and after treatment with oryzalin.
+
+```{r nucpositionoryzalintreatment}
+knitr::opts_chunk$set(
+  fig.path = "../plots/")
+#imports root hair data.
+roothairdata <- read_csv("../data/2017_4_6_complete_dataset.csv", col_names = TRUE) %>%
+  #combines ID and root_hair number columns to create a combined, more descriptive root hair ID (rh_ID)
+  unite(rh_ID, ID, root_hair, sep = "_")
+
+#calculates the mean distance of the nucleus from the root hair tip over 20 minutes before oryzalin treatment for each root hair
+nucmeans<- roothairdata %>%
+  filter(oryzalin_treated == 'no') %>%
+  group_by(rh_ID) %>%
+  summarise(mean_nuc_distance = mean(nuc_to_tip_length)) #%>%
+#rejoins nucmeans with original data set to compare pretreatment mean nuc distance to nuc distances at each time point
+newhairdata<-left_join(roothairdata, nucmeans, by = 'rh_ID') %>%
+  group_by(rh_ID, oryzalin_treated) %>%
+  mutate(distance_from_mean = nuc_to_tip_length - mean_nuc_distance) 
+#one data set for pretreatment
+pretreatment <- newhairdata %>%
+  filter(oryzalin_treated =="no")
+#one data set for posttreatment
+posttreatment <- newhairdata %>%
+  filter(oryzalin_treated =="yes")
+#plots position of nucleus at each time point, relative to the pre-treatment mean position of that nucleus
+treatmentplot <- 
+  ggplot() + 
+  geom_smooth(data = pretreatment, aes(x = time, y = distance_from_mean, group = rh_ID, color = genotype), se = FALSE) + 
+  geom_smooth(data = posttreatment, aes(x = time, y = distance_from_mean, group = rh_ID, color = genotype), se = FALSE) +  
+  facet_wrap(~oryzalin_treated)
+print(treatmentplot) 
+```
+Each line represents the position of one nucleus over time.  
+0 is the pre-treatment mean distance for each line
+At each time point, the y-value is equal to the distance of the nucleus from the tip MINUS the pre-treatment mean distance
+When iT3 is treated with oryzalin, the variability in nuclear position increases more significantly than in WT.
